@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace Graphics
@@ -23,13 +24,25 @@ namespace Graphics
         internal void Destroy()
         {
             // cleanup render texture. 
-            Clear(ref SSSInstance.LightingTex);
-            Clear(ref SSSInstance.LightingTexBlurred);
-            Clear(ref SSSInstance.SSS_ProfileTex);
-            
-            SSSInstance.LightingTex.Release();
-            SSSInstance.LightingTexBlurred.Release();
-            SSSInstance.SSS_ProfileTex.Release();
+            if (ReferenceEquals(SSSInstance, null)) return;
+
+            if (!ReferenceEquals(null, SSSInstance.LightingTex))
+            {
+                Clear(ref SSSInstance.LightingTex);
+                SSSInstance.LightingTex.Release();
+            }
+
+            if (!ReferenceEquals(null, SSSInstance.LightingTexBlurred))
+            {
+                Clear(ref SSSInstance.LightingTexBlurred);
+                SSSInstance.LightingTexBlurred.Release();
+            }
+
+            if (!ReferenceEquals(null, SSSInstance.SSS_ProfileTex))
+            {
+                Clear(ref SSSInstance.SSS_ProfileTex);
+                SSSInstance.SSS_ProfileTex.Release();
+            }
         }
 
         private static void Clear(ref RenderTexture texture)
@@ -38,6 +51,18 @@ namespace Graphics
             RenderTexture.active = texture;
             GL.Clear(true, true, Color.clear);
             RenderTexture.active = rt;
+        }
+
+        IEnumerator WaitForCamera()
+        {
+            Camera camera = Graphics.Instance.CameraSettings.MainCamera;
+            yield return new WaitUntil(() => camera != null);
+            SSSInstance = camera.GetOrAddComponent<SSS>();
+        }
+        public void CheckInstance()
+        {
+            if (SSSInstance == null)
+                Graphics.Instance.StartCoroutine(WaitForCamera());
         }
     }
 }
