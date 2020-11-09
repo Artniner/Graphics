@@ -106,7 +106,7 @@ namespace Graphics.Settings
             _volume.isGlobal = true;
             _volume.blendDistance = 0;
             _volume.weight = 1;
-            _volume.priority = 1;
+            _volume.priority = 1024; // To prevent any kind of map/system overriding our post-processing settings. The graphics will be the "only" graphics setting.
             _volume.useGUILayout = true;
             _volume.sharedProfile = SettingValues.profile;
             _volume.profile = SettingValues.profile;
